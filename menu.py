@@ -3,27 +3,21 @@
 import pygame
 import os
 import sys
+import json
 
-from button_class import Button
+from classes import Button
 
 pygame.init()
 
-WIDTH, HEIGHT = 350, 600
+WIDTH, HEIGHT = 400, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
-FONT_SIZE_MENU = 40
-FONT_SIZE_OPTIONS = 10
+FONT_SIZE_MENU = 50
+FONT_SIZE_OPTIONS = 20
 FONT_SIZE_BACK = 20
 
 # Carcateristicas del display principal
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Tetris")
-
-# Texto
-about_text = """Tetris es un videojuego de lógica originalmente diseñado
-y programado por Alekséi Pázhitnov en la Unión Soviética.
-Fue lanzado el 6 de junio de 1984, ​ mientras trabajaba para
-el Centro de Computación Dorodnitsyn de la Academia de Ciencias
-de la Unión Soviética en Moscú, RSFS de Rusia."""
+pygame.display.set_caption("SPACESHIP SHOOTER")
 
 # Imagenes
 BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
@@ -32,26 +26,46 @@ BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
 BUTTON_BIG = pygame.image.load(os.path.join("Assets", "button_rect.png"))
 BUTTON_RECT = pygame.transform.scale(BUTTON_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
 
-#PLAY_BIG = pygame.image.load(os.path.join("Assets", "Play Rect.png"))
-#PLAY_RECT = pygame.transform.scale(PLAY_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
-
-#OPREC_BIG = pygame.image.load(os.path.join("assets", "Options Rect.png"))
-#OPTIONS_RECT = pygame.transform.scale(OPREC_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
-
-#ABOUT_BIG = pygame.image.load(os.path.join("Assets", "About Rect.png"))
-#QUIT_RECT = pygame.transform.scale(ABOUT_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
-
-#QUIT_BIG = pygame.image.load(os.path.join("Assets", "Quit Rect.png"))
-#QUIT_RECT = pygame.transform.scale(QUIT_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
-
 # Colores
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+YELLOW = (255, 198, 51)
+GRAY = (150, 150, 150)
+
+# FUNCIONES -------------------------------------------------------------------
+
+
+# Funcion para mover el fondo del juego
+def scrolling_backgroud():
+
+    run = True
+    y_position = 0
+
+    while run:
+        WINDOW.fill(BLACK)
+        WINDOW.blit(BACKGROUND_MAIN, (0, y_position))
+        WINDOW.blit(BACKGROUND_MAIN, (0, HEIGHT + y_position))
+
+        if y_position == -HEIGHT:
+            WINDOW.blit(BACKGROUND_MAIN, (0, HEIGHT + y_position))
+            y_position = 0
+
+        y_position -= 1
 
 
 # Funcion para cambiar el tamano de la tipgrafia
 def get_font(size):  # Returns Press-Start-2P in the desired size
     return pygame.font.Font(os.path.join('Assets', 'font.ttf'), size)
+
+
+# Render multiples lineas
+def multiline_render(render_text):
+    position = 50
+    pygame.draw.rect(WINDOW, BLACK, pygame.Rect(0, 0, 0, 0))
+    for x in range(len(render_text)):
+        rendered = get_font(30).render(render_text[x], 100, (WHITE))
+        WINDOW.blit(rendered, (20, position))
+        position += 40
 
 
 def play():
@@ -60,11 +74,13 @@ def play():
 
         WINDOW.fill(BLACK)
 
-        PLAY_TEXT = get_font(FONT_SIZE_OPTIONS).render("This is the PLAY screen.", True, "White")
+        PLAY_TEXT = get_font(FONT_SIZE_OPTIONS).render("OPCIONES", True,
+                                                       "White")
         PLAY_RECT = PLAY_TEXT.get_rect(center=(WIDTH/2, HEIGHT/4))
         WINDOW.blit(PLAY_TEXT, PLAY_RECT)
 
-        PLAY_BACK = Button(None, (WIDTH/2, HEIGHT - 100), "VOLVER", get_font(FONT_SIZE_BACK), WHITE, "Green")
+        PLAY_BACK = Button(None, (WIDTH/2, HEIGHT - 100), "VOLVER",
+                           get_font(FONT_SIZE_BACK), WHITE, YELLOW)
 
         PLAY_BACK.changeColor(PLAY_MOUSE_POS)
         PLAY_BACK.update(WINDOW)
@@ -84,13 +100,16 @@ def options():
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
-        WINDOW.fill("white")
+        WINDOW.fill(BLACK)
 
-        OPTIONS_TEXT = get_font(FONT_SIZE_OPTIONS).render("This is the OPTIONS screen.", True, "Black")
+        OPTIONS_TEXT = get_font(FONT_SIZE_OPTIONS).render("OPCIONES",
+                                                          True, WHITE)
+
         OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH/2, HEIGHT/2))
         WINDOW.blit(OPTIONS_TEXT, OPTIONS_RECT)
 
-        OPTIONS_BACK = Button(None, (WIDTH/2, HEIGHT - 100), "VOLVER", get_font(FONT_SIZE_BACK), "Black", "Green")
+        OPTIONS_BACK = Button(None, (WIDTH/2, HEIGHT - 100), "VOLVER",
+                              get_font(FONT_SIZE_BACK), WHITE, YELLOW)
 
         OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_BACK.update(WINDOW)
@@ -108,16 +127,15 @@ def options():
 
 # Funcion para mostar uan breve explicacion acerca del juego
 def about():
+    WINDOW.blit(BACKGROUND_MAIN, (0, 0))
     while True:
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
-        WINDOW.fill(BLACK)
+        with open(os.path.join('Assets', 'about.json')) as show:
+            multiline_render(json.load(show))
 
-        PLAY_TEXT = get_font(FONT_SIZE_OPTIONS).render(about_text, True, "White")
-        PLAY_RECT = PLAY_TEXT.get_rect(center=(WIDTH/2, HEIGHT/4))
-        WINDOW.blit(PLAY_TEXT, PLAY_RECT)
-
-        PLAY_BACK = Button(None, (WIDTH/2, HEIGHT-100), "VOLVER", get_font(FONT_SIZE_BACK), WHITE, "Green")
+        PLAY_BACK = Button(None, (WIDTH/2, HEIGHT-100), "VOLVER",
+                           get_font(FONT_SIZE_BACK), WHITE, YELLOW)
 
         PLAY_BACK.changeColor(PLAY_MOUSE_POS)
         PLAY_BACK.update(WINDOW)
@@ -139,15 +157,30 @@ def main_menu():
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
-        MENU_TEXT = get_font(FONT_SIZE_MENU).render("TETRIS", True, "#b68f40")
-        MENU_RECT = MENU_TEXT.get_rect(center=(WIDTH/2, HEIGHT/5))
+        MENU_TEXT_1 = get_font(FONT_SIZE_MENU).render("SPACESHIP",
+                                                      True, YELLOW)
 
-        PLAY_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3), "PLAY", get_font(FONT_SIZE_OPTIONS), "#d7fcd4", WHITE)
-        OPTIONS_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3 + 100), "OPTIONS", get_font(FONT_SIZE_OPTIONS), "#d7fcd4", WHITE)
-        ABOUT_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3 + 200), "ABOUT", get_font(FONT_SIZE_OPTIONS), "#d7fcd4", WHITE)
-        QUIT_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3 + 300), "QUIT", get_font(FONT_SIZE_OPTIONS), "#d7fcd4", WHITE)
+        MENU_TEXT_2 = get_font(FONT_SIZE_MENU - 10).render("SHOOTER",
+                                                           True, YELLOW)
 
-        WINDOW.blit(MENU_TEXT, MENU_RECT)
+        MENU_RECT_1 = MENU_TEXT_1.get_rect(center=(WIDTH/2, HEIGHT/8))
+        MENU_RECT_2 = MENU_TEXT_2.get_rect(center=(WIDTH/2, HEIGHT/5))
+
+        PLAY_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3), "JUGAR",
+                             get_font(FONT_SIZE_OPTIONS), WHITE, GRAY)
+
+        OPTIONS_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3 + 100),
+                                "OPCIONES", get_font(FONT_SIZE_OPTIONS),
+                                WHITE, GRAY)
+
+        ABOUT_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3 + 200), "ACERCA",
+                              get_font(FONT_SIZE_OPTIONS), WHITE, GRAY)
+
+        QUIT_BUTTON = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3 + 300), "SALIR",
+                             get_font(FONT_SIZE_OPTIONS), WHITE, GRAY)
+
+        WINDOW.blit(MENU_TEXT_1, MENU_RECT_1)
+        WINDOW.blit(MENU_TEXT_2, MENU_RECT_2)
 
         for button in [PLAY_BUTTON, OPTIONS_BUTTON, ABOUT_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
@@ -159,7 +192,8 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play()
+                    # play()
+                    scrolling_backgroud()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options()
                 if ABOUT_BUTTON.checkForInput(MENU_MOUSE_POS):

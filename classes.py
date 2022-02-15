@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-# Creacion del objeto boton, cuya implementacion se incluye en el menu
-# principal y en los sub menues.
+# Clase boton, cuya implementacion se incluye en el menu principal y en los
+# sub menues.
 class Button():
     def __init__(self, image, position, text_in, font, base_color, sec_color):
         self.image = image

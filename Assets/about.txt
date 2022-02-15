@@ -1,5 +1,0 @@
-Tetris es un videojuego de lógica originalmente diseñado
-y programado por Alekséi Pázhitnov en la Unión Soviética.
-Fue lanzado el 6 de junio de 1984, ​ mientras trabajaba para
-el Centro de Computación Dorodnitsyn de la Academia de Ciencias
-de la Unión Soviética en Moscú, RSFS de Rusia.
