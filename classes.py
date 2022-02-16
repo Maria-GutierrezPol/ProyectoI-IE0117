@@ -1,5 +1,13 @@
 #!/usr/bin/python3
 
+import pygame
+import os
+
+BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
+BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (400, 600))
+WINDOW = pygame.display.set_mode((400, 600))
+
+
 # Clase boton, cuya implementacion se incluye en el menu principal y en los
 # sub menues.
 class Button():
@@ -42,3 +50,27 @@ class Button():
         else:
             self.text = self.font.render(
                         self.text_in, True, self.base_color)
+
+
+class moving_background:
+    def __init__(self):
+        self.background = BACKGROUND_MAIN
+        self.rect = self.background.get_rect()
+        self.x_position = 0
+        self.y1_position = 0
+        self.y2_position = self.rect.height
+        self.speed = 0.1
+
+    def window_update(self):
+        self.y1_position -= self.speed
+        self.y2_position -= self.speed
+
+        if self.y1_position <= -self.rect.height:
+            self.y1_position = self.rect.height
+
+        if self.y2_position <= -self.rect.height:
+            self.y2_position = self.rect.height
+
+    def move_background(self):
+        WINDOW.blit(self.background, (self.x_position, self.y1_position))
+        WINDOW.blit(self.background, (self.x_position, self.y2_position))

@@ -5,60 +5,46 @@ import os
 import sys
 import json
 
-from classes import Button
+from classes import Button, moving_background
 
 pygame.init()
 
+# Constantes ------------------------------------------------------------------
 WIDTH, HEIGHT = 400, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 FONT_SIZE_MENU = 50
 FONT_SIZE_OPTIONS = 20
 FONT_SIZE_BACK = 20
 
-# Carcateristicas del display principal
+# Carcateristicas del display principal ---------------------------------------
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SPACESHIP SHOOTER")
 
-# Imagenes
+# Imagenes --------------------------------------------------------------------
 BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
 BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
 
 BUTTON_BIG = pygame.image.load(os.path.join("Assets", "button_rect.png"))
 BUTTON_RECT = pygame.transform.scale(BUTTON_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
 
-# Colores
+# Colores ---------------------------------------------------------------------
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 YELLOW = (255, 198, 51)
 GRAY = (150, 150, 150)
 
+# Instancias
+background = moving_background()
+
 # FUNCIONES -------------------------------------------------------------------
 
 
-# Funcion para mover el fondo del juego
-def scrolling_backgroud():
-
-    run = True
-    y_position = 0
-
-    while run:
-        WINDOW.fill(BLACK)
-        WINDOW.blit(BACKGROUND_MAIN, (0, y_position))
-        WINDOW.blit(BACKGROUND_MAIN, (0, HEIGHT + y_position))
-
-        if y_position == -HEIGHT:
-            WINDOW.blit(BACKGROUND_MAIN, (0, HEIGHT + y_position))
-            y_position = 0
-
-        y_position -= 1
-
-
 # Funcion para cambiar el tamano de la tipgrafia
-def get_font(size):  # Returns Press-Start-2P in the desired size
+def get_font(size):
     return pygame.font.Font(os.path.join('Assets', 'font.ttf'), size)
 
 
-# Render multiples lineas
+# Funcion para mostrar multiples lineas de texto en la pantalla
 def multiline_render(render_text):
     position = 50
     pygame.draw.rect(WINDOW, BLACK, pygame.Rect(0, 0, 0, 0))
@@ -68,7 +54,8 @@ def multiline_render(render_text):
         position += 40
 
 
-def play():
+# BORRAR
+def play_borrar():
     while True:
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -93,6 +80,25 @@ def play():
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
 
+        pygame.display.update()
+
+
+def play():
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+                quit()
+
+        esc_pressed = pygame.key.get_pressed()
+        if esc_pressed[pygame.K_ESCAPE]:
+            main_menu()
+
+        background.window_update()
+        background.move_background()
         pygame.display.update()
 
 
@@ -192,8 +198,7 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    # play()
-                    scrolling_backgroud()
+                    play()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options()
                 if ABOUT_BUTTON.checkForInput(MENU_MOUSE_POS):
