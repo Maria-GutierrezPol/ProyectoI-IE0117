@@ -1,16 +1,39 @@
 #!/usr/bin/python3
 
 import pygame
+import random
 import os
 
+# CONSTANTES ------------------------------------------------------------------
+PLAYER_SIZE = (80, 80)
+ENEMY_SIZE = (80, 80)
+WIDTH, HEIGHT = 400, 600
+
+# IMAGENES --------------------------------------------------------------------
+
 BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
-BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (400, 600))
-WINDOW = pygame.display.set_mode((400, 600))
+BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
+PLAYER = pygame.image.load(os.path.join('Assets', 'player.png'))
+
+ENEMY_1 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level1.png')), 180)
+
+ENEMY_2 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level2.png')), 180)
+
+ENEMY_3 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level3.png')), 180)
+
+# DISPLAY ---------------------------------------------------------------------
+
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# CLASES ----------------------------------------------------------------------
 
 
 # Clase boton, cuya implementacion se incluye en el menu principal y en los
 # sub menues.
-class Button():
+class Button:
     def __init__(self, image, position, text_in, font, base_color, sec_color):
         self.image = image
         self.x = position[0]
@@ -51,7 +74,7 @@ class Button():
             self.text = self.font.render(
                         self.text_in, True, self.base_color)
 
-
+# Clase pare el movimiento del fondo junto con las naves.
 class moving_background:
     def __init__(self):
         self.background = BACKGROUND_MAIN
@@ -74,3 +97,50 @@ class moving_background:
     def move_background(self):
         WINDOW.blit(self.background, (self.x_position, self.y1_position))
         WINDOW.blit(self.background, (self.x_position, self.y2_position))
+
+# Clase para el jugador.
+class player:
+    def __init__(self):
+        self.player = pygame.transform.scale(PLAYER, (PLAYER_SIZE))
+        self.x_position = 200 - 40
+        self.y_position = 600 - 80
+
+    def show(self):
+        WINDOW.blit(self.player, (self.x_position, self.y_position))
+
+    def x_movement(self):
+
+        keys_pressed = pygame.key.get_pressed()
+
+        if keys_pressed[pygame.K_RIGHT] and self.x_position < WIDTH - 65:
+            self.x_position += 0.15
+        elif keys_pressed[pygame.K_LEFT] and self.x_position > -15:
+            self.x_position -= 0.15
+
+
+# Clase para los enemigos
+class enemies:
+    def __init__(self):
+        self.enemy_ship_1 = pygame.transform.scale(ENEMY_1, (ENEMY_SIZE))
+        self.enemy_ship_2 = pygame.transform.scale(ENEMY_2, (ENEMY_SIZE))
+        self.enemy_ship_3 = pygame.transform.scale(ENEMY_3, (ENEMY_SIZE))
+        self.x_position = random.randint(0, WIDTH - 100)
+        self.y_position = 0
+        self.change_x = 0.1
+        self.change_y = 0.1
+
+    def show(self):
+        WINDOW.blit(self.enemy_ship_1, (self.x_position, self.y_position))
+
+    def x_movement(self):
+        self.x_position += self.change_x
+        self.y_position += self.change_y
+
+        # Evitar que el enemigo salga de la pantalla
+        if self.x_position <= 0:
+            self.change_x += 0.1
+        elif self.x_position > WIDTH - 100:
+            self.change_x -= 0.1
+
+        if self.y_position <= 0:
+            self.change_y += 0.0001

@@ -3,6 +3,7 @@
 import pygame
 import os
 import random
+import time
 
 from classes import moving_background
 pygame.init()
@@ -10,7 +11,7 @@ pygame.init()
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 WIDTH, HEIGHT = 400, 600
-ENEMY_SIZE = (100, 100)
+ENEMY_SIZE = (80, 80)
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
 BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
@@ -18,17 +19,21 @@ BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
 ENEMY_1 = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level1.png')), 180)
 
+ENEMY_2 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level2.png')), 180)
+
+ENEMY_3 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level3.png')), 180)
+
 ayuda = moving_background()
 
 
 class enemies:
     def __init__(self):
         self.enemy_ship_1 = pygame.transform.scale(ENEMY_1, (ENEMY_SIZE))
-        self.enemy_ship_2 = pygame.image.load(
-                            os.path.join('Assets', 'button_rect.png'))
-        self.enemy_ship_3 = pygame.image.load(
-                            os.path.join('Assets', 'button_rect.png'))
-        self.x_position = random.randint(0, WIDTH)
+        self.enemy_ship_2 = pygame.transform.scale(ENEMY_2, (ENEMY_SIZE))
+        self.enemy_ship_3 = pygame.transform.scale(ENEMY_3, (ENEMY_SIZE))
+        self.x_position = random.randint(0, WIDTH - 100)
         self.y_position = 0
         self.change_x = 0.1
         self.change_y = 0.1
@@ -47,7 +52,7 @@ class enemies:
             self.change_x -= 0.1
 
         if self.y_position <= 0:
-            self.change_y += 0.001
+            self.change_y += 0.0001
 
 
 ru = True
@@ -59,6 +64,8 @@ while ru:
         if event.type == pygame.QUIT:
             ru = False
 
+    ayuda.window_update()
+    ayuda.move_background()
     enemy.show()
     enemy.x_movement()
     pygame.display.update()

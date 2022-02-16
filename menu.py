@@ -5,7 +5,7 @@ import os
 import sys
 import json
 
-from classes import Button, moving_background
+from classes import Button, moving_background, player, enemies
 
 pygame.init()
 
@@ -35,6 +35,8 @@ GRAY = (150, 150, 150)
 
 # Instancias
 background = moving_background()
+enemy = enemies()
+player = player()
 
 # FUNCIONES -------------------------------------------------------------------
 
@@ -99,6 +101,10 @@ def play():
 
         background.window_update()
         background.move_background()
+        player.show()
+        player.x_movement()
+        enemy.show()
+        enemy.x_movement()
         pygame.display.update()
 
 
