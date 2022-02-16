@@ -12,7 +12,7 @@ pygame.init()
 WIDTH, HEIGHT = 400, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 FONT_SIZE_MENU = 50
-FONT_SIZE_OPTIONS = 20
+FONT_SIZE_OPTIONS = 16
 FONT_SIZE_BACK = 20
 
 # Carcateristicas del display principal
@@ -31,6 +31,12 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 YELLOW = (255, 198, 51)
 GRAY = (150, 150, 150)
+BLUE = (30, 144,255)
+
+# sonido del juego
+pygame.mixer.music.load('Sounds/dragonball.mpga')
+pygame.mixer.music.play(loops=-1)
+pygame.mixer.music.set_volume(0.5)
 
 # FUNCIONES -------------------------------------------------------------------
 
@@ -92,6 +98,9 @@ def play():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.display.set_mode(SCREEN)        
 
         pygame.display.update()
 
@@ -103,16 +112,32 @@ def options():
         WINDOW.fill(BLACK)
 
         OPTIONS_TEXT = get_font(FONT_SIZE_OPTIONS).render("OPCIONES",
-                                                          True, WHITE)
+                                                          True, BLUE)
 
-        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH/2, HEIGHT/2))
+        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH/2, HEIGHT/6))
         WINDOW.blit(OPTIONS_TEXT, OPTIONS_RECT)
 
-        OPTIONS_BACK = Button(None, (WIDTH/2, HEIGHT - 100), "VOLVER",
-                              get_font(FONT_SIZE_BACK), WHITE, YELLOW)
+        OPTIONS_BACK = Button(BUTTON_RECT, (WIDTH/2, HEIGHT - 100), "VOLVER",
+                              get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
 
         OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_BACK.update(WINDOW)
+
+        OPTIONS_sonidoA = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/2), "Activar sonido",
+                                get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
+        OPTIONS_sonidoA.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_sonidoA.update(WINDOW)
+        #sound_on = True
+        OPTIONS_sonidoD = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3), "Desactivar sonido",
+                                get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
+        OPTIONS_sonidoD.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_sonidoD.update(WINDOW)
+
+        OPTIONS_fs = Button(BUTTON_RECT, (WIDTH/2, HEIGHT-200), "Pantalla completa",
+                            get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
+        OPTIONS_fs.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_fs.update(WINDOW)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -121,6 +146,15 @@ def options():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                     main_menu()
+                if OPTIONS_sonidoA.checkForInput(OPTIONS_MOUSE_POS):
+                    pygame.mixer.music.play(loops=-1)
+                if OPTIONS_sonidoD.checkForInput(OPTIONS_MOUSE_POS):
+                    pygame.mixer.music.stop()
+                if OPTIONS_fs.checkForInput(OPTIONS_MOUSE_POS):
+                    pygame.display.set_mode(SCREEN, pygame.SCALED | pygame.FULLSCREEN)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.display.set_mode(SCREEN)
 
         pygame.display.update()
 
@@ -147,6 +181,9 @@ def about():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.display.set_mode(SCREEN)
 
         pygame.display.update()
 
@@ -201,6 +238,9 @@ def main_menu():
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.display.set_mode(SCREEN)
 
         pygame.display.update()
 
