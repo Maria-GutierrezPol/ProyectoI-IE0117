@@ -116,6 +116,25 @@ class player:
             self.x_position += 0.15
         elif keys_pressed[pygame.K_LEFT] and self.x_position > -15:
             self.x_position -= 0.15
+                    
+    def shoot(self):
+        keys_pressed = pygame.key.get_pressed()
+
+        if keys_pressed[pygame.K_SPACE]:
+            if self.b_state == "ready":
+                self.b_state = "shoot"
+                self.xb_position = self.x_position
+
+        if self.b_state == "shoot":
+            WINDOW.blit(self.bullet, (
+                                       self.xb_position + 24,
+                                       self.yb_position - 32
+                                       ))
+            self.yb_position -= self.bullet_speed
+
+        if self.yb_position <= 0:
+            self.yb_position = 600 - 80
+            self.b_state = "ready"
 
 
 # Clase para los enemigos
