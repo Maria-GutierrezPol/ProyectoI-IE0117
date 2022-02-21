@@ -8,6 +8,7 @@ import os
 PLAYER_SIZE = (80, 80)
 ENEMY_SIZE = (80, 80)
 WIDTH, HEIGHT = 400, 600
+BULLET_SIZE = (32, 32)
 
 # IMAGENES --------------------------------------------------------------------
 
@@ -23,6 +24,8 @@ ENEMY_2 = pygame.transform.rotate(pygame.image.load(
 
 ENEMY_3 = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level3.png')), 180)
+
+BULLET = pygame.image.load(os.path.join('Assets', 'enemy_bullet.png'))
 
 # DISPLAY ---------------------------------------------------------------------
 
@@ -98,24 +101,50 @@ class moving_background:
         WINDOW.blit(self.background, (self.x_position, self.y1_position))
         WINDOW.blit(self.background, (self.x_position, self.y2_position))
 
+
 # Clase para el jugador.
 class player:
     def __init__(self):
         self.player = pygame.transform.scale(PLAYER, (PLAYER_SIZE))
         self.x_position = 200 - 40
         self.y_position = 600 - 80
+        self.xb_position = 0
+        self.yb_position = 600 - 80
+        self.bullet_speed = 1
+        self.b_state = "ready"
+        self.b_list = []
 
     def show(self):
         WINDOW.blit(self.player, (self.x_position, self.y_position))
 
     def x_movement(self):
-
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[pygame.K_RIGHT] and self.x_position < WIDTH - 65:
-            self.x_position += 0.15
+            self.x_position += 0.2
         elif keys_pressed[pygame.K_LEFT] and self.x_position > -15:
-            self.x_position -= 0.15
+            self.x_position -= 0.2
+
+    def shoot(self):
+        keys_pressed = pygame.key.get_pressed()
+
+        if keys_pressed[pygame.K_SPACE]:
+            bullet = pygame.transform.scale(BULLET, (BULLET_SIZE))
+            self.b_list.append(bullet)
+
+            if self.b_state == "ready":
+                self.b_state = "shoot"
+                self.xb_position = self.x_position
+
+        if self.b_state == "shoot":
+            for bullet in self.b_list:
+                WINDOW.blit(bullet, (self.xb_position + 24,
+                            self.yb_position - 32))
+            self.yb_position -= self.bullet_speed
+
+        if self.yb_position <= 0:
+            self.yb_position = 600 - 80
+            self.b_state = "ready"
 
 
 # Clase para los enemigos
