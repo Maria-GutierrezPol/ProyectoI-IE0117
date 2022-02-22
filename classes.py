@@ -77,6 +77,7 @@ class Button:
             self.text = self.font.render(
                         self.text_in, True, self.base_color)
 
+
 # Clase pare el movimiento del fondo junto con las naves.
 class moving_background:
     def __init__(self):
@@ -149,19 +150,19 @@ class player:
 
 # Clase para los enemigos
 class enemies:
-    def __init__(self):
-        self.enemy_ship_1 = pygame.transform.scale(ENEMY_1, (ENEMY_SIZE))
-        self.enemy_ship_2 = pygame.transform.scale(ENEMY_2, (ENEMY_SIZE))
-        self.enemy_ship_3 = pygame.transform.scale(ENEMY_3, (ENEMY_SIZE))
+    def __init__(self, enemy_ship):
+        #self.enemy_ship_1 = pygame.transform.scale(ENEMY_1, (ENEMY_SIZE))
+        #self.enemy_ship_2 = pygame.transform.scale(ENEMY_2, (ENEMY_SIZE))
+        #self.enemy_ship_3 = pygame.transform.scale(ENEMY_3, (ENEMY_SIZE))
         self.x_position = random.randint(0, WIDTH - 100)
-        self.y_position = 0
-        self.change_x = 0.1
-        self.change_y = 0.1
+        self.y_position = random.randint(-500, -100)
+        self.change_x = 0.001
+        self.change_y = 0.001
 
-    def show(self):
-        WINDOW.blit(self.enemy_ship_1, (self.x_position, self.y_position))
+    def show(self, enemy_ship):
+        WINDOW.blit(enemy_ship, (self.x_position, self.y_position))
 
-    def x_movement(self):
+    def movement(self):
         self.x_position += self.change_x
         self.y_position += self.change_y
 

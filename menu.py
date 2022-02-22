@@ -4,6 +4,7 @@ import pygame
 import os
 import sys
 import json
+import random
 
 from classes import Button, moving_background, player, enemies
 
@@ -15,6 +16,7 @@ BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 FONT_SIZE_MENU = 50
 FONT_SIZE_OPTIONS = 16
 FONT_SIZE_BACK = 20
+ENEMY_SIZE = (80, 80)
 
 # Carcateristicas del display principal ---------------------------------------
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -27,6 +29,10 @@ BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
 BUTTON_BIG = pygame.image.load(os.path.join("Assets", "button_rect.png"))
 BUTTON_RECT = pygame.transform.scale(BUTTON_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
 
+ENEMY_1 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level1.png')), 180)
+
+
 # Colores ---------------------------------------------------------------------
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -34,17 +40,20 @@ YELLOW = (255, 198, 51)
 GRAY = (150, 150, 150)
 BLUE = (30, 144, 255)
 
-# sonido del juego
+# Sonido del juego ------------------------------------------------------------
 pygame.mixer.music.load(os.path.join("Assets", "dragonball.mpga"))
 pygame.mixer.music.play(loops=-1)
-pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.set_volume(0)
 
-# Instancias
+# Instancias ------------------------------------------------------------------
 background = moving_background()
-enemy = enemies()
 player = player()
 
-# FUNCIONES -------------------------------------------------------------------
+# Listas ----------------------------------------------------------------------
+enemy_list = []
+enemy_count = 5
+
+# FUNCIONES -------------- ----------------------------------------------------
 
 
 # Funcion para cambiar el tamano de la tipgrafia
@@ -95,8 +104,27 @@ def play_borrar():
 
 
 def play():
+    score = 0
+    enemy_count = 2
     run = True
     while run:
+
+        if len(enemy_list) == 0:
+            score += 100
+            enemy_count += 1
+            for number in range(enemy_count):
+                new_element = enemies(pygame.transform.scale(ENEMY_1,
+                                      (ENEMY_SIZE)))
+
+                enemy_list.append(new_element)
+
+        for new_element in enemy_list:
+            new_element.show(pygame.transform.scale(ENEMY_1, (ENEMY_SIZE)))
+            new_element.movement()
+
+            if new_element.y_position > HEIGHT + 10:
+                score -= 20
+                enemy_list.remove(new_element)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -108,14 +136,13 @@ def play():
         if esc_pressed[pygame.K_ESCAPE]:
             main_menu()
 
+        pygame.display.update()
+
         background.window_update()
         background.move_background()
         player.show()
         player.x_movement()
-        enemy.show()
-        enemy.x_movement()
         player.shoot()
-        pygame.display.update()
 
 
 def options():
