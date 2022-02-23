@@ -87,13 +87,13 @@ class Button:
 
 # Clase pare el movimiento del fondo junto con las naves.
 class moving_background:
-    def __init__(self):
+    def __init__(self, velocity):
         self.background = BACKGROUND_MAIN
         self.rect = self.background.get_rect()
         self.x_position = 0
         self.y1_position = 0
         self.y2_position = self.rect.height
-        self.speed = 2
+        self.speed = velocity
 
     def window_update(self):
         self.y1_position -= self.speed
@@ -158,6 +158,9 @@ class player:
             self.yb_position = 600 - 80
             self.b_state = "ready"
 
+    def remove(self):
+        self.b_list.append(bullet)
+
 
 class bullet:
     def __init__(self, bullet_image, x_position, y_position):
@@ -176,10 +179,8 @@ class enemies:
         self.by_position = self.y_position
         self.xb_position = self.x_position + 15
         self.change_x = 0.5
-        self.change_y = 0.5
+        self.change_y = 1
         self.enemy_bullets = []
-        self.counter = 0
-        # self.mask = pygame.mask.from_surface(self)
 
     def show(self, enemy_ship):
         WINDOW.blit(enemy_ship, (self.x_position, self.y_position))

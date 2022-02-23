@@ -4,8 +4,9 @@ import pygame
 import os
 import sys
 import json
+import math
 
-from classes import Button, moving_background, player, enemies, bullet
+from classes import Button, moving_background, player, enemies
 
 pygame.init()
 
@@ -54,9 +55,11 @@ BLUE = (30, 144, 255)
 pygame.mixer.music.load(os.path.join("Assets", "dragonball.mpga"))
 pygame.mixer.music.play(loops=-1)
 pygame.mixer.music.set_volume(0.1)
+down_sound = pygame.mixer.Sound(os.path.join('Assets', 'down.mpga'))
 
 # Instancias ------------------------------------------------------------------
-background = moving_background()
+background = moving_background(2)
+about_background = moving_background(1)
 player = player()
 
 # Listas ----------------------------------------------------------------------
@@ -71,30 +74,41 @@ def get_font(size):
     return pygame.font.Font(os.path.join('Assets', 'font.ttf'), size)
 
 
+# Funcion con la tipografia de la seccion "Acerca"
+def get_font_about(size):
+    return pygame.font.Font(os.path.join('Assets', 'mandalore.ttf'), size)
+
+
+# Funcion para calcular la distancia
+def collision(bullet_x, bullet_y, enemy_x, enemy_y):
+    distance = math.sqrt((math.pow(enemy_x - bullet_x, 2) +
+                         math.pow(enemy_y - bullet_y, 2)))
+    if distance < 20:
+        return True
+
+
 # Funcion para mostrar multiples lineas de texto en la pantalla
 def multiline_render(render_text):
-    position = 50
+    position_y = 100
+    position_x = 120
+    size_line = 18
     pygame.draw.rect(WINDOW, BLACK, pygame.Rect(0, 0, 0, 0))
     for x in range(len(render_text)):
-        rendered = get_font(30).render(render_text[x], 100, (WHITE))
-        WINDOW.blit(rendered, (20, position))
-        position += 40
-
-
-# Fucion para determinar si un elemento se encunetra sobre otro, es decir, si
-# colisionan.
-def collision(first_element, second_element):
-    x_distance = second_element.x_position - first_element.y_position
-    y_distance = second_element.y_position - first_element.y_position
-    return first_element.mask.overlap(second_element.mask,
-                                      (x_distance, y_distance))
+        rendered = get_font_about(size_line).render(render_text[x], 100,
+                                                    (YELLOW))
+        WINDOW.blit(rendered, (position_x, position_y))
+        position_y += 45
+        position_x -= 22
+        size_line += 2
 
 
 # Funcion para implementar el juego, recibe la puntuacion inicial del jugador
 # (incialmente 0) y el contador de enemigos, el que se encarga de generar olas
 # de ataque enemigo, en cada ola se incrementa el numero de naves enemigas.
-def play(score, enemy_count):
+def play(enemy_count):
     run = True
+    score = 50
+    lives = 5
     while run:
         clock.tick(FPS)
         player.show()
@@ -104,7 +118,6 @@ def play(score, enemy_count):
         # Si la lista de enemigos se encuentra vacia se agregan un enemigo mas
         # en la ola anterior.
         if len(enemy_list) == 0:
-            score += 100
             enemy_count += 1
             for number in range(enemy_count):
                 new_element = enemies(pygame.transform.scale(ENEMY_1,
@@ -117,14 +130,32 @@ def play(score, enemy_count):
             new_element.show(pygame.transform.scale(ENEMY_1, (ENEMY_SIZE)))
             new_element.movement()
 
+            # Disparo de las nevaes enemigas
             if new_element.y_position > 0:
                 new_element.bullet_movement(5)
                 new_element.shoot(pygame.transform.scale(BULLET,
                                   (BULLET_SIZE)))
 
-            # Si la nave llega al final de la pantalla, se elimina de la Lista
-            # y se disminuye el puntaje del jugador.
-            if new_element.y_position > HEIGHT + 10:
+            # COLISION
+            # Caso 1: la bala enemiga toca al jugador
+            if collision(new_element.xb_position, new_element.by_position,
+                         player.x_position, player.y_position) is True:
+                score -= 20
+                lives -= 1
+                down_sound.play()
+
+            # Caso 2: La bala del jugador toca a la nave enemiga
+            elif collision(player.xb_position, player.yb_position,
+                           new_element.x_position,
+                           new_element.y_position) is True:
+                score += 20
+                down_sound.play()
+                enemy_list.remove(new_element)
+                player.yb_position = 0
+
+            # Caso 3: la nave llega al final de la pantalla
+            elif new_element.y_position > HEIGHT + 10:
+                lives -= 1
                 score -= 20
                 enemy_list.remove(new_element)
 
@@ -139,10 +170,16 @@ def play(score, enemy_count):
         esc_pressed = pygame.key.get_pressed()
         if esc_pressed[pygame.K_ESCAPE]:
             main_menu()
-            run = False
 
+
+        LIVES = get_font_about(20).render(f"Vidas: {lives}", 1,  YELLOW)
+        SCORE = get_font_about(20).render(f"Puntaje: {score}", 1, YELLOW)
+        ESC = get_font_about(20).render("esc", True, YELLOW)
+
+        WINDOW.blit(LIVES, (10, 10))
+        WINDOW.blit(SCORE, (10, 30))
+        WINDOW.blit(ESC, (WIDTH - 30, 10))
         pygame.display.update()
-
         background.window_update()
         background.move_background()
 
@@ -151,7 +188,7 @@ def options():
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
-        WINDOW.fill(BLACK)
+        WINDOW.blit(BACKGROUND_MAIN, (0, 0))
 
         OPTIONS_TEXT = get_font(FONT_SIZE_OPTIONS).render("OPCIONES",
                                                           True, BLUE)
@@ -219,6 +256,11 @@ def about():
         PLAY_BACK.changeColor(PLAY_MOUSE_POS)
         PLAY_BACK.update(WINDOW)
 
+        PLAY_BUTTON = Button(None, (WIDTH/2, HEIGHT-180), "JUGAR",
+                             get_font(FONT_SIZE_OPTIONS), WHITE, BLUE)
+        PLAY_BUTTON.changeColor(PLAY_MOUSE_POS)
+        PLAY_BUTTON.update(WINDOW)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -226,12 +268,15 @@ def about():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
+                if PLAY_BUTTON.checkForInput(PLAY_MOUSE_POS):
+                    play(1)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.display.set_mode(SCREEN)
 
         pygame.display.update()
-
+        about_background.window_update()
+        about_background.move_background()
 
 def main_menu():
     while True:
@@ -274,7 +319,7 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play(0, 1)
+                    play(1)
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options()
                 if ABOUT_BUTTON.checkForInput(MENU_MOUSE_POS):
