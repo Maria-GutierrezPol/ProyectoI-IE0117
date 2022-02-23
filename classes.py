@@ -155,9 +155,6 @@ class player:
             self.yb_position = 600 - 80
             self.b_state = "ready"
 
-    def remove(self):
-        self.b_list.append(bullet)
-
 
 class bullet:
     def __init__(self, bullet_image, x_position, y_position):
