@@ -4,7 +4,6 @@ import pygame
 import os
 import sys
 import json
-import random
 
 from classes import Button, moving_background, player, enemies, bullet
 
@@ -54,7 +53,7 @@ BLUE = (30, 144, 255)
 # Sonido del juego ------------------------------------------------------------
 pygame.mixer.music.load(os.path.join("Assets", "dragonball.mpga"))
 pygame.mixer.music.play(loops=-1)
-pygame.mixer.music.set_volume(0)
+pygame.mixer.music.set_volume(0.1)
 
 # Instancias ------------------------------------------------------------------
 background = moving_background()
@@ -82,6 +81,15 @@ def multiline_render(render_text):
         position += 40
 
 
+# Fucion para determinar si un elemento se encunetra sobre otro, es decir, si
+# colisionan.
+def collision(first_element, second_element):
+    x_distance = second_element.x_position - first_element.y_position
+    y_distance = second_element.y_position - first_element.y_position
+    return first_element.mask.overlap(second_element.mask,
+                                      (x_distance, y_distance))
+
+
 # Funcion para implementar el juego, recibe la puntuacion inicial del jugador
 # (incialmente 0) y el contador de enemigos, el que se encarga de generar olas
 # de ataque enemigo, en cada ola se incrementa el numero de naves enemigas.
@@ -89,6 +97,9 @@ def play(score, enemy_count):
     run = True
     while run:
         clock.tick(FPS)
+        player.show()
+        player.x_movement()
+        player.shoot()
 
         # Si la lista de enemigos se encuentra vacia se agregan un enemigo mas
         # en la ola anterior.
@@ -106,10 +117,10 @@ def play(score, enemy_count):
             new_element.show(pygame.transform.scale(ENEMY_1, (ENEMY_SIZE)))
             new_element.movement()
 
-            if random.randrange(0, 120) == 1:
+            if new_element.y_position > 0:
+                new_element.bullet_movement(5)
                 new_element.shoot(pygame.transform.scale(BULLET,
                                   (BULLET_SIZE)))
-                new_element.bullet_movement(50)
 
             # Si la nave llega al final de la pantalla, se elimina de la Lista
             # y se disminuye el puntaje del jugador.
@@ -134,9 +145,6 @@ def play(score, enemy_count):
 
         background.window_update()
         background.move_background()
-        player.show()
-        player.x_movement()
-        player.shoot()
 
 
 def options():

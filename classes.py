@@ -165,28 +165,27 @@ class bullet:
         self.y_position = y_position
         self.bullet_image = bullet_image
 
-    def bullet_movement(self, velocity):
-        self.y_position += velocity
-
-    # def collision(self, object):
-    #    return collide(self, object)
-
 
 # Clase para los enemigos
 class enemies:
+    COUNTER = 30
+
     def __init__(self, enemy_ship):
         self.x_position = random.randint(0, WIDTH - 100)
-        self.y_position = random.randint(-300, -100)
-        self.by_position = -self.y_position
+        self.y_position = random.randint(-30, -10)
+        self.by_position = self.y_position
+        self.xb_position = self.x_position + 15
         self.change_x = 0.5
         self.change_y = 0.5
         self.enemy_bullets = []
+        self.counter = 0
+        # self.mask = pygame.mask.from_surface(self)
 
     def show(self, enemy_ship):
         WINDOW.blit(enemy_ship, (self.x_position, self.y_position))
         for bullet in self.enemy_bullets:
             WINDOW.blit(pygame.transform.scale(RED_BULLET, (BULLET_SIZE)),
-                        (self.x_position + 27, self.by_position + 50))
+                        (self.xb_position + 30, self.by_position + 50))
 
     def movement(self):
         self.x_position += self.change_x
@@ -205,9 +204,6 @@ class enemies:
         self.by_position += velocity
 
     def shoot(self, red_bullet):
-        counter = pygame.time.get_ticks()
-        if counter > 2000:
-            new_enemy_bullet = bullet(red_bullet, self.x_position,
-                                      self.by_position)
-            self.enemy_bullets.append(new_enemy_bullet)
-            counter = 0
+        new_enemy_bullet = bullet(red_bullet, self.xb_position,
+                                  self.by_position)
+        self.enemy_bullets.append(new_enemy_bullet)
