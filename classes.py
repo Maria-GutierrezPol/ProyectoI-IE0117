@@ -114,6 +114,7 @@ class moving_background:
 class player:
     def __init__(self):
         self.player = pygame.transform.scale(PLAYER, (PLAYER_SIZE))
+        self.bullet = pygame.transform.scale(BULLET, (BULLET_SIZE))
         self.x_position = 200 - 40
         self.y_position = 600 - 80
         self.xb_position = 0
@@ -140,18 +141,14 @@ class player:
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[pygame.K_SPACE]:
-            bullet = pygame.transform.scale(BULLET, (BULLET_SIZE))
-            self.b_list.append(bullet)
-            bullet_sound.play()
-
             if self.b_state == "ready":
+                bullet_sound.play()
                 self.b_state = "shoot"
                 self.xb_position = self.x_position
 
         if self.b_state == "shoot":
-            for bullet in self.b_list:
-                WINDOW.blit(bullet, (self.xb_position + 24,
-                            self.yb_position - 32))
+            WINDOW.blit(self.bullet, (self.xb_position + 24,
+                        self.yb_position - 32))
             self.yb_position -= self.bullet_speed
 
         if self.yb_position <= 0:
