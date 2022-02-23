@@ -6,7 +6,7 @@ import sys
 import json
 import random
 
-from classes import Button, moving_background, player, enemies
+from classes import Button, moving_background, player, enemies, bullet
 
 pygame.init()
 
@@ -17,10 +17,13 @@ FONT_SIZE_MENU = 50
 FONT_SIZE_OPTIONS = 16
 FONT_SIZE_BACK = 20
 ENEMY_SIZE = (80, 80)
+BULLET_SIZE = (30, 30)
+FPS = 60
 
 # Carcateristicas del display principal ---------------------------------------
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SPACESHIP SHOOTER")
+clock = pygame.time.Clock()
 
 # Imagenes --------------------------------------------------------------------
 BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
@@ -32,6 +35,14 @@ BUTTON_RECT = pygame.transform.scale(BUTTON_BIG, (BUTTON_WIDTH, BUTTON_HEIGHT))
 ENEMY_1 = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level1.png')), 180)
 
+ENEMY_2 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level2.png')), 180)
+
+ENEMY_3 = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'enemy_level3.png')), 180)
+
+BULLET = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'player_bullet.png')), 90)
 
 # Colores ---------------------------------------------------------------------
 WHITE = (255, 255, 255)
@@ -51,7 +62,7 @@ player = player()
 
 # Listas ----------------------------------------------------------------------
 enemy_list = []
-enemy_count = 5
+enemy_bullet = []
 
 # FUNCIONES -------------- ----------------------------------------------------
 
@@ -71,57 +82,37 @@ def multiline_render(render_text):
         position += 40
 
 
-# BORRAR
-def play_borrar():
-    while True:
-        PLAY_MOUSE_POS = pygame.mouse.get_pos()
-
-        WINDOW.fill(BLACK)
-
-        PLAY_TEXT = get_font(FONT_SIZE_OPTIONS).render("OPCIONES", True,
-                                                       "White")
-        PLAY_RECT = PLAY_TEXT.get_rect(center=(WIDTH/2, HEIGHT/4))
-        WINDOW.blit(PLAY_TEXT, PLAY_RECT)
-
-        PLAY_BACK = Button(None, (WIDTH/2, HEIGHT - 100), "VOLVER",
-                           get_font(FONT_SIZE_BACK), WHITE, YELLOW)
-
-        PLAY_BACK.changeColor(PLAY_MOUSE_POS)
-        PLAY_BACK.update(WINDOW)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
-                    main_menu()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.display.set_mode(SCREEN)
-
-        pygame.display.update()
-
-
-def play():
-    score = 0
-    enemy_count = 2
+# Funcion para implementar el juego, recibe la puntuacion inicial del jugador
+# (incialmente 0) y el contador de enemigos, el que se encarga de generar olas
+# de ataque enemigo, en cada ola se incrementa el numero de naves enemigas.
+def play(score, enemy_count):
     run = True
     while run:
+        clock.tick(FPS)
 
+        # Si la lista de enemigos se encuentra vacia se agregan un enemigo mas
+        # en la ola anterior.
         if len(enemy_list) == 0:
             score += 100
             enemy_count += 1
             for number in range(enemy_count):
                 new_element = enemies(pygame.transform.scale(ENEMY_1,
                                       (ENEMY_SIZE)))
-
                 enemy_list.append(new_element)
 
+        # Por cada elemento en la lista, es decir, por cada enemigo creado se
+        # dibuja en pantalla y se le aplica movimiento.
         for new_element in enemy_list:
             new_element.show(pygame.transform.scale(ENEMY_1, (ENEMY_SIZE)))
             new_element.movement()
 
+            if random.randrange(0, 120) == 1:
+                new_element.shoot(pygame.transform.scale(BULLET,
+                                  (BULLET_SIZE)))
+                new_element.bullet_movement(50)
+
+            # Si la nave llega al final de la pantalla, se elimina de la Lista
+            # y se disminuye el puntaje del jugador.
             if new_element.y_position > HEIGHT + 10:
                 score -= 20
                 enemy_list.remove(new_element)
@@ -132,9 +123,12 @@ def play():
                 pygame.quit()
                 quit()
 
+        # Si el jugador presiona la tecla "esc" se pausa el juego y se vuelve
+        # al menu principal.
         esc_pressed = pygame.key.get_pressed()
         if esc_pressed[pygame.K_ESCAPE]:
             main_menu()
+            run = False
 
         pygame.display.update()
 
@@ -272,7 +266,7 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play()
+                    play(0, 1)
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options()
                 if ABOUT_BUTTON.checkForInput(MENU_MOUSE_POS):

@@ -4,11 +4,13 @@ import pygame
 import random
 import os
 
+pygame.init()
+
 # CONSTANTES ------------------------------------------------------------------
-PLAYER_SIZE = (80, 80)
+PLAYER_SIZE = (70, 70)
 ENEMY_SIZE = (80, 80)
 WIDTH, HEIGHT = 400, 600
-BULLET_SIZE = (32, 32)
+BULLET_SIZE = (30, 30)
 
 # IMAGENES --------------------------------------------------------------------
 
@@ -25,11 +27,16 @@ ENEMY_2 = pygame.transform.rotate(pygame.image.load(
 ENEMY_3 = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level3.png')), 180)
 
-BULLET = pygame.image.load(os.path.join('Assets', 'enemy_bullet.png'))
+BULLET = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'player_bullet.png')), 90)
+
+RED_BULLET = pygame.transform.rotate(pygame.image.load(
+          os.path.join('Assets', 'red_bullet.png')), 90)
 
 # DISPLAY ---------------------------------------------------------------------
 
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+bullet_sound = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
 
 # CLASES ----------------------------------------------------------------------
 
@@ -86,7 +93,7 @@ class moving_background:
         self.x_position = 0
         self.y1_position = 0
         self.y2_position = self.rect.height
-        self.speed = 0.1
+        self.speed = 2
 
     def window_update(self):
         self.y1_position -= self.speed
@@ -111,27 +118,31 @@ class player:
         self.y_position = 600 - 80
         self.xb_position = 0
         self.yb_position = 600 - 80
-        self.bullet_speed = 1
+        self.bullet_speed = 8
         self.b_state = "ready"
         self.b_list = []
 
+    # Dibujar al jjugador en pantalla.
     def show(self):
         WINDOW.blit(self.player, (self.x_position, self.y_position))
 
+    # Movimiento del jugador, unicamente se da en la coordenada x.
     def x_movement(self):
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[pygame.K_RIGHT] and self.x_position < WIDTH - 65:
-            self.x_position += 0.2
+            self.x_position += 1.5
         elif keys_pressed[pygame.K_LEFT] and self.x_position > -15:
-            self.x_position -= 0.2
+            self.x_position -= 1.5
 
+    # Disparo del jugador, se da al presionar la tecla espaciaora.
     def shoot(self):
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[pygame.K_SPACE]:
             bullet = pygame.transform.scale(BULLET, (BULLET_SIZE))
             self.b_list.append(bullet)
+            bullet_sound.play()
 
             if self.b_state == "ready":
                 self.b_state = "shoot"
@@ -148,29 +159,55 @@ class player:
             self.b_state = "ready"
 
 
+class bullet:
+    def __init__(self, bullet_image, x_position, y_position):
+        self.x_position = x_position
+        self.y_position = y_position
+        self.bullet_image = bullet_image
+
+    def bullet_movement(self, velocity):
+        self.y_position += velocity
+
+    # def collision(self, object):
+    #    return collide(self, object)
+
+
 # Clase para los enemigos
 class enemies:
     def __init__(self, enemy_ship):
-        #self.enemy_ship_1 = pygame.transform.scale(ENEMY_1, (ENEMY_SIZE))
-        #self.enemy_ship_2 = pygame.transform.scale(ENEMY_2, (ENEMY_SIZE))
-        #self.enemy_ship_3 = pygame.transform.scale(ENEMY_3, (ENEMY_SIZE))
         self.x_position = random.randint(0, WIDTH - 100)
-        self.y_position = random.randint(-500, -100)
-        self.change_x = 0.001
-        self.change_y = 0.001
+        self.y_position = random.randint(-300, -100)
+        self.by_position = -self.y_position
+        self.change_x = 0.5
+        self.change_y = 0.5
+        self.enemy_bullets = []
 
     def show(self, enemy_ship):
         WINDOW.blit(enemy_ship, (self.x_position, self.y_position))
+        for bullet in self.enemy_bullets:
+            WINDOW.blit(pygame.transform.scale(RED_BULLET, (BULLET_SIZE)),
+                        (self.x_position + 27, self.by_position + 50))
 
     def movement(self):
         self.x_position += self.change_x
         self.y_position += self.change_y
 
-        # Evitar que el enemigo salga de la pantalla
+        # Evitar que el enemigo salga de la pantalla.
         if self.x_position <= 0:
-            self.change_x += 0.1
+            self.change_x += 0.005
         elif self.x_position > WIDTH - 100:
-            self.change_x -= 0.1
+            self.change_x -= 0.005
 
         if self.y_position <= 0:
-            self.change_y += 0.0001
+            self.change_y += 0.005
+
+    def bullet_movement(self, velocity):
+        self.by_position += velocity
+
+    def shoot(self, red_bullet):
+        counter = pygame.time.get_ticks()
+        if counter > 2000:
+            new_enemy_bullet = bullet(red_bullet, self.x_position,
+                                      self.by_position)
+            self.enemy_bullets.append(new_enemy_bullet)
+            counter = 0
