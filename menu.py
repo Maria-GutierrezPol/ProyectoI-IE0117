@@ -51,7 +51,7 @@ BLUE = (30, 144, 255)
 # Sonido del juego ------------------------------------------------------------
 pygame.mixer.music.load(os.path.join("Assets", "cancion.mpga"))
 pygame.mixer.music.play(loops=-1)
-pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.set_volume(0.2)
 down_sound_enemies = pygame.mixer.Sound(os.path.join('Assets', 'boom.mpga'))
 down_sound_player = pygame.mixer.Sound(os.path.join('Assets', 'down.mpga'))
 enemies_sound = pygame.mixer.Sound(os.path.join('Assets', 'down_en.mpga'))
@@ -90,12 +90,14 @@ def collision(bullet_x, bullet_y, enemy_x, enemy_y):
         return True
 
 
-# Función para mostrar multiples líneas de texto en la pantalla
+# Función para mostrar multiples líneas de texto en la pantalla del about.
+# Se define la posición y el tamaño del texto.
 def multiline_render(render_text):
     position_y = 100
     position_x = 120
     size_line = 17
     pygame.draw.rect(WINDOW, BLACK, pygame.Rect(0, 0, 0, 0))
+# Se realiza el siguiente for para variar el tamaño y la posición del texto.
     for x in range(len(render_text)):
         rendered = get_font_about(size_line).render(render_text[x], 100,
                                                     (YELLOW))
@@ -254,26 +256,26 @@ def options():
         OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_BACK.update(WINDOW)
 
-        # Opción de activar sonido
+        # Creación del botón para la opción de activar música del juego.
         OPTIONS_SOUND_ACT = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/2),
-                                   "Activar sonido",
+                                   "Activar música",
                                    get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
         OPTIONS_SOUND_ACT.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_SOUND_ACT.update(WINDOW)
 
-        # Opción de apagar el sonido
+        # Creación del botón para la opción de apagar la música del juego.
         OPTIONS_SOUND_DES = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3),
-                                   "Desactivar sonido",
+                                   "Desactivar música",
                                    get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
         OPTIONS_SOUND_DES.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_SOUND_DES.update(WINDOW)
 
         # Opción pantalla completa
-        OPTIONS_fs = Button(BUTTON_RECT, (WIDTH/2, HEIGHT-200),
+        OPTIONS_FS = Button(BUTTON_RECT, (WIDTH/2, HEIGHT-200),
                             "Pantalla completa",
                             get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
-        OPTIONS_fs.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_fs.update(WINDOW)
+        OPTIONS_FS.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_FS.update(WINDOW)
 
         # Asignación de las tareas a realizar al presionar cada botón.
         for event in pygame.event.get():
@@ -287,7 +289,7 @@ def options():
                     pygame.mixer.music.play(loops=-1)
                 if OPTIONS_SOUND_DES.checkForInput(OPTIONS_MOUSE_POS):
                     pygame.mixer.music.stop()
-                if OPTIONS_fs.checkForInput(OPTIONS_MOUSE_POS):
+                if OPTIONS_FS.checkForInput(OPTIONS_MOUSE_POS):
                     pygame.display.set_mode(SCREEN,
                                             pygame.SCALED | pygame.FULLSCREEN)
             if event.type == pygame.KEYDOWN:
