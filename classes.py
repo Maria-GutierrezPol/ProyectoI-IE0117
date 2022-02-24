@@ -20,8 +20,7 @@ BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
 ENEMY_1 = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level1.png')), 180)
 
-PLAYER = pygame.transform.rotate(pygame.image.load(
-          os.path.join('Assets', 'enemy_level3.png')), 180)
+PLAYER = pygame.image.load(os.path.join('Assets', 'enemy_level3.png'))
 
 BULLET = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'player_bullet.png')), 90)

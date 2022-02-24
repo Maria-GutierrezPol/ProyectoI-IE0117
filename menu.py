@@ -49,7 +49,7 @@ GRAY = (150, 150, 150)
 BLUE = (30, 144, 255)
 
 # Sonido del juego ------------------------------------------------------------
-pygame.mixer.music.load(os.path.join("Assets", "dragonball.mpga"))
+pygame.mixer.music.load(os.path.join("Assets", "cancion.mpga"))
 pygame.mixer.music.play(loops=-1)
 pygame.mixer.music.set_volume(0.1)
 down_sound_enemies = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
