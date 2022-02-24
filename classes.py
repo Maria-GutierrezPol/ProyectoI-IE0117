@@ -38,7 +38,7 @@ bullet_sound = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
 # CLASES ----------------------------------------------------------------------
 
 
-# Clase boton, cuya implementacion se incluye en el menu principal y en los
+# Clase botón, cuya implementacion se incluye en el menu principal y en los
 # sub menues.
 class Button:
     def __init__(self, image, position, text_in, font, base_color, sec_color):
@@ -57,21 +57,21 @@ class Button:
         self.rect = self.image.get_rect(center=(self.x, self.y))
         self.text_rect = self.text.get_rect(center=(self.x, self.y))
 
-    # Funcion para actualizar la pantalla principal
+    # Función para actualizar la pantalla principal
     def update(self, screen):
         if self.image is not None:
             screen.blit(self.image, self.rect)
         screen.blit(self.text, self.text_rect)
 
-    # Funcion para revisar si el usuario dio algun input
+    # Función para revisar si el usuario dio algun input
     def checkForInput(self, position):
         if position[0] in range(self.rect.left, self.rect.right):
             if position[1] in range(self.rect.top, self.rect.bottom):
                 return True
         return False
 
-    # Funcion para determinar si el usuario se encunetra posicionado sobre
-    # algun boton del menu, de ser asi cambia su color.
+    # Función para determinar si el usuario se encuentra posicionado sobre
+    # algun botón del menu, de ser asi cambia su color.
     def changeColor(self, position):
         if position[0] in range(self.rect.left, self.rect.right):
             if position[1] in range(self.rect.top, self.rect.bottom):
@@ -119,7 +119,7 @@ class player:
         self.bullet_speed = 8
         self.b_state = "ready"
 
-    # Dibujar al jjugador en pantalla.
+    # Dibujar al jugador en pantalla.
     def show(self):
         WINDOW.blit(self.player, (self.x_position, self.y_position))
 
@@ -151,6 +151,15 @@ class player:
             self.yb_position = 600 - 80
             self.b_state = "ready"
 
+    # Reestablecer la nave del jugador al terminar el juego.
+    def restart(self):
+        self.x_position = 200 - 40
+        self.y_position = 600 - 80
+        self.xb_position = 0
+        self.yb_position = 600 - 80
+        self.b_state = "ready"
+
+
 # Clase bala, se utiliza únicamnete para crear una bala, ya que no presenta
 # métodos
 class bullet:
@@ -162,8 +171,6 @@ class bullet:
 
 # Clase para los enemigos
 class enemies:
-    COUNTER = 30
-
     def __init__(self, enemy_ship):
         self.x_position = random.randint(0, WIDTH - 100)
         self.y_position = random.randint(-30, -10)

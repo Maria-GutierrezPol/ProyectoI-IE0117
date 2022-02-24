@@ -20,7 +20,7 @@ ENEMY_SIZE = (80, 80)
 BULLET_SIZE = (30, 30)
 FPS = 60
 
-# Carcaterísticas del display principal ---------------------------------------
+# Características del display principal ---------------------------------------
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SPACESHIP SHOOTER")
 clock = pygame.time.Clock()
@@ -107,6 +107,7 @@ def multiline_render(render_text):
         size_line += 2
 
 
+# Función para mostrar durante el juego el puntaje
 def show_scores(score):
     # Mensajes a imprimir en pantalla
     GAME = get_font_about(20).render("SPACESHIP SHOOTER", 1, YELLOW)
@@ -207,8 +208,7 @@ def play():
             for new_element in enemy_list:
                 enemy_list.remove(new_element)
                 new_element.restart()
-            for new_element in enemy_list:
-                enemy_list.remove(new_element)
+            player.restart()
             run = False
 
         # Salir del juego
@@ -389,7 +389,7 @@ def main_menu():
             button.changeColor(MENU_MOUSE_POS)
             button.update(WINDOW)
 
-        # Asiganción de las tareas a realizar con cada botón
+        # Asignación de las tareas a realizar con cada botón
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
