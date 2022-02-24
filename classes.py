@@ -7,7 +7,7 @@ import os
 pygame.init()
 
 # CONSTANTES ------------------------------------------------------------------
-PLAYER_SIZE = (70, 70)
+PLAYER_SIZE = (80, 80)
 ENEMY_SIZE = (80, 80)
 WIDTH, HEIGHT = 400, 600
 BULLET_SIZE = (30, 30)
@@ -16,15 +16,11 @@ BULLET_SIZE = (30, 30)
 
 BACKGROUND_BIG = pygame.image.load(os.path.join('Assets', 'wallpaper.jpg'))
 BACKGROUND_MAIN = pygame.transform.scale(BACKGROUND_BIG, (WIDTH, HEIGHT))
-PLAYER = pygame.image.load(os.path.join('Assets', 'player.png'))
 
 ENEMY_1 = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level1.png')), 180)
 
-ENEMY_2 = pygame.transform.rotate(pygame.image.load(
-          os.path.join('Assets', 'enemy_level2.png')), 180)
-
-ENEMY_3 = pygame.transform.rotate(pygame.image.load(
+PLAYER = pygame.transform.rotate(pygame.image.load(
           os.path.join('Assets', 'enemy_level3.png')), 180)
 
 BULLET = pygame.transform.rotate(pygame.image.load(
