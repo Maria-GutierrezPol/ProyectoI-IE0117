@@ -258,14 +258,14 @@ def options():
 
         # Creación del botón para la opción de activar música del juego.
         OPTIONS_SOUND_ACT = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/2),
-                                   "Activar música",
+                                   "ACTIVAR MÚISICA",
                                    get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
         OPTIONS_SOUND_ACT.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_SOUND_ACT.update(WINDOW)
 
         # Creación del botón para la opción de apagar la música del juego.
         OPTIONS_SOUND_DES = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3),
-                                   "Desactivar música",
+                                   "DESACTIVAR MÚSICA",
                                    get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
         OPTIONS_SOUND_DES.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_SOUND_DES.update(WINDOW)
