@@ -52,9 +52,9 @@ BLUE = (30, 144, 255)
 pygame.mixer.music.load(os.path.join("Assets", "dragonball.mpga"))
 pygame.mixer.music.play(loops=-1)
 pygame.mixer.music.set_volume(0.1)
-down_sound = pygame.mixer.Sound(os.path.join('Assets', 'down.mpga'))
-enemy_sound = pygame.mixer.Sound(os.path.join('Assets', 'down_enemy.mpga'))
-bullet_sound = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
+down_sound_enemies = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
+down_sound_player = pygame.mixer.Sound(os.path.join('Assets', 'down.mpga'))
+enemies_sound = pygame.mixer.Sound(os.path.join('Assets', 'down_en.mpga'))
 
 # Instancias ------------------------------------------------------------------
 background = moving_background(2)
@@ -94,7 +94,7 @@ def collision(bullet_x, bullet_y, enemy_x, enemy_y):
 def multiline_render(render_text):
     position_y = 100
     position_x = 120
-    size_line = 18
+    size_line = 17
     pygame.draw.rect(WINDOW, BLACK, pygame.Rect(0, 0, 0, 0))
     for x in range(len(render_text)):
         rendered = get_font_about(size_line).render(render_text[x], 100,
@@ -126,7 +126,6 @@ def play():
     enemy_count = 1
     run = True
     lost = False
-    lost_count = 0
     score = 50
     while run:
         clock.tick(FPS)
@@ -144,7 +143,7 @@ def play():
                 new_element = enemies(pygame.transform.scale(ENEMY_1,
                                       (ENEMY_SIZE)))
                 enemy_list.append(new_element)
-                enemy_sound.play()
+                enemies_sound.play()
 
         # Por cada elemento en la lista, es decir, por cada enemigo creado se
         # dibuja en pantalla y se le aplica movimiento.
@@ -162,6 +161,7 @@ def play():
             # Caso 1: la bala enemiga toca al jugador
             if collision(new_element.xb_position, new_element.by_position,
                          player.x_position, player.y_position) is True:
+                down_sound_player.play()
                 lost = True
 
             # Caso 2: La bala del jugador toca a la nave enemiga
@@ -169,7 +169,7 @@ def play():
                            new_element.x_position,
                            new_element.y_position) is True:
                 score += 20
-                down_sound.play()
+                down_sound_player.play()
                 enemy_list.remove(new_element)
                 player.yb_position = 0
 
@@ -177,6 +177,7 @@ def play():
             elif new_element.y_position > HEIGHT + 10:
                 score -= 20
                 enemy_list.remove(new_element)
+                new_element.restart()
 
             # Si el jugador presiona la tecla "esc" se pausa el juego y se
             # vuelve al menú principal.
@@ -191,9 +192,21 @@ def play():
         # perdió la partida.
         if lost is True:
             SCORE = get_font_about(30).render("Juego finalizado", True, YELLOW)
-            WINDOW.blit(SCORE, (WIDTH/2 - SCORE.get_width()/2, HEIGHT/2))
+            FINAL = get_font_about(20).render(f"Puntaje: {score}", 1, YELLOW)
+            WINDOW.blit(SCORE, (WIDTH/2 - SCORE.get_width()/2, HEIGHT/2 - 20))
+            WINDOW.blit(FINAL, (WIDTH/2 - FINAL.get_width()/2, HEIGHT/2 + 20))
             pygame.display.update()
             pygame.time.wait(1500)
+            lost = False
+
+            # Resetear la función, de esta manera el juego comienza de cero
+            # una vez pérdido.
+            enemy_count = 0
+            for new_element in enemy_list:
+                enemy_list.remove(new_element)
+                new_element.restart()
+            for new_element in enemy_list:
+                enemy_list.remove(new_element)
             run = False
 
         # Salir del juego
@@ -203,6 +216,7 @@ def play():
                 pygame.quit()
                 quit()
 
+        # Ajustes gráficos
         show_scores(score)
         pygame.display.update()
         background.window_update()
@@ -241,18 +255,18 @@ def options():
         OPTIONS_BACK.update(WINDOW)
 
         # Opción de activar sonido
-        OPTIONS_sonidoA = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/2),
-                                 "Activar sonido", get_font(FONT_SIZE_OPTIONS),
-                                 WHITE, YELLOW)
-        OPTIONS_sonidoA.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_sonidoA.update(WINDOW)
+        OPTIONS_SOUND_ACT = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/2),
+                                   "Activar sonido",
+                                   get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
+        OPTIONS_SOUND_ACT.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_SOUND_ACT.update(WINDOW)
 
         # Opción de apagar el sonido
-        OPTIONS_sonidoD = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3),
-                                 "Desactivar sonido",
-                                 get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
-        OPTIONS_sonidoD.changeColor(OPTIONS_MOUSE_POS)
-        OPTIONS_sonidoD.update(WINDOW)
+        OPTIONS_SOUND_DES = Button(BUTTON_RECT, (WIDTH/2, HEIGHT/3),
+                                   "Desactivar sonido",
+                                   get_font(FONT_SIZE_OPTIONS), WHITE, YELLOW)
+        OPTIONS_SOUND_DES.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_SOUND_DES.update(WINDOW)
 
         # Opción pantalla completa
         OPTIONS_fs = Button(BUTTON_RECT, (WIDTH/2, HEIGHT-200),
@@ -269,9 +283,9 @@ def options():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                     main_menu()
-                if OPTIONS_sonidoA.checkForInput(OPTIONS_MOUSE_POS):
+                if OPTIONS_SOUND_ACT.checkForInput(OPTIONS_MOUSE_POS):
                     pygame.mixer.music.play(loops=-1)
-                if OPTIONS_sonidoD.checkForInput(OPTIONS_MOUSE_POS):
+                if OPTIONS_SOUND_DES.checkForInput(OPTIONS_MOUSE_POS):
                     pygame.mixer.music.stop()
                 if OPTIONS_fs.checkForInput(OPTIONS_MOUSE_POS):
                     pygame.display.set_mode(SCREEN,

@@ -117,7 +117,6 @@ class player:
         self.yb_position = 600 - 80
         self.bullet_speed = 8
         self.b_state = "ready"
-        self.b_list = []
 
     # Dibujar al jjugador en pantalla.
     def show(self):
@@ -151,7 +150,8 @@ class player:
             self.yb_position = 600 - 80
             self.b_state = "ready"
 
-
+# Clase bala, se utiliza únicamnete para crear una bala, ya que no presenta
+# métodos
 class bullet:
     def __init__(self, bullet_image, x_position, y_position):
         self.x_position = x_position
@@ -172,12 +172,14 @@ class enemies:
         self.change_y = 1
         self.enemy_bullets = []
 
+    # Mostrar enemigos en pantalla
     def show(self, enemy_ship):
         WINDOW.blit(enemy_ship, (self.x_position, self.y_position))
         for bullet in self.enemy_bullets:
             WINDOW.blit(pygame.transform.scale(RED_BULLET, (BULLET_SIZE)),
                         (self.xb_position + 30, self.by_position + 50))
 
+    # Movimiento de los enemigos
     def movement(self):
         self.x_position += self.change_x
         self.y_position += self.change_y
@@ -191,10 +193,19 @@ class enemies:
         if self.y_position <= 0:
             self.change_y += 0.005
 
+    # Movimiento de las balas enemigas
     def bullet_movement(self, velocity):
         self.by_position += velocity
 
+    # Crear nueva bala
     def shoot(self, red_bullet):
         new_enemy_bullet = bullet(red_bullet, self.xb_position,
                                   self.by_position)
         self.enemy_bullets.append(new_enemy_bullet)
+
+    # Resetear la lista de balas para poder jugar varias veces
+    def restart(self):
+        self.x_position = random.randint(0, WIDTH - 100)
+        self.y_position = random.randint(-30, -10)
+        for new_enemy_bullet in self.enemy_bullets:
+            self.enemy_bullets.remove(new_enemy_bullet)
