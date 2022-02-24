@@ -13,3 +13,6 @@ Integrantes:
 * Brandon Cascante Rodríguez - B71732
 * María José Gutiérrez Pol - B83679
 * Susan Moraga López - B75140
+
+Cómo jugar:
+Ejecute desde la terminal el comando"./menu.py", al estar ubicado en el directorio del repositorio. 
