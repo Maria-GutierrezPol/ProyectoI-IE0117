@@ -31,6 +31,8 @@ RED_BULLET = pygame.transform.rotate(pygame.image.load(
 # DISPLAY ---------------------------------------------------------------------
 
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Sonido del disparo del jugador.
 bullet_sound = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
 
 # CLASES ----------------------------------------------------------------------
