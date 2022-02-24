@@ -52,7 +52,7 @@ BLUE = (30, 144, 255)
 pygame.mixer.music.load(os.path.join("Assets", "cancion.mpga"))
 pygame.mixer.music.play(loops=-1)
 pygame.mixer.music.set_volume(0.1)
-down_sound_enemies = pygame.mixer.Sound(os.path.join('Assets', 'blaster.mpga'))
+down_sound_enemies = pygame.mixer.Sound(os.path.join('Assets', 'boom.mpga'))
 down_sound_player = pygame.mixer.Sound(os.path.join('Assets', 'down.mpga'))
 enemies_sound = pygame.mixer.Sound(os.path.join('Assets', 'down_en.mpga'))
 
@@ -169,7 +169,7 @@ def play():
                            new_element.x_position,
                            new_element.y_position) is True:
                 score += 20
-                down_sound_player.play()
+                down_sound_enemies.play()
                 enemy_list.remove(new_element)
                 player.yb_position = 0
 
